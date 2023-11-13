@@ -1,0 +1,17 @@
+**/*.RDS
+**/*.gtf
+**/data/
+nextflow_pipeline/workflow/work/
+nextflow_pipeline/workflow/results/
+**/*.sif
+**/*.bed
+**/*.fa
+**/*.pdf
+**/*.tsv
+**/*.txt
+scripts/deseq_out/
+scripts/deseq_prep_files/
+scripts/nanoplot_outputs/
+scripts/oldslurm/
+**/*.err
+**/*.out
