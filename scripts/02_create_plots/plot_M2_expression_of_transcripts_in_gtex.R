@@ -129,7 +129,7 @@ ggsave('../../figures/M2_GTEx_expression/M2_gtex_cpm_thresholds_all_v_pc_proport
 # like a really really big venn diagram
 # looking at what isoforms are unique/shared between tissues, only looking at the top 20 categories
 iso_to_tiss <- read_tsv('../../tables/GTEx_expression/GTEx_isoforms_in_tissues_passing_med_CPM_gt_1.tsv') %>% 
-	pivot_longer(!c(transcript_id, gene_id), names_to = 'tissue', values_to = 'med_CPM') %>% 
+	pivot_longer(!c(transcript_id, gene_id, gene_name, gene_biotype), names_to = 'tissue', values_to = 'med_CPM') %>% 
 	drop_na() %>% 
 	group_by(transcript_id) %>%
         summarize(tissue = list(unique(tissue))) %>%
@@ -202,10 +202,10 @@ tiss_color <- setNames(hue_pal()(length(tissues_to_use)), levels(as.factor(tissu
 
 # For each tissue, plot the number of isoforms expressed per gene (or protein-coding isoforms per gene) as a histogram
 n_tx_per_gene <- read_tsv('../../tables/GTEx_expression/GTEx_number_of_tx_per_gene_passing_thresholds_2023.tsv') %>%
-	pivot_longer(!c('gene_id', 'gene_biotype'), names_to = 'tissue', values_to = 'n_tx') %>%
+	pivot_longer(!c('gene_id', 'gene_biotype', 'gene_name'), names_to = 'tissue', values_to = 'n_tx') %>%
 	drop_na()
 n_tx_per_pc_gene <- read_tsv('../../tables/GTEx_expression/GTEx_number_of_protein_coding_tx_per_gene_passing_thresholds_2023.tsv') %>%
-	pivot_longer(!c('gene_id', 'gene_biotype'), names_to = 'tissue', values_to = 'n_tx') %>%
+	pivot_longer(!c('gene_id', 'gene_biotype', 'gene_name'), names_to = 'tissue', values_to = 'n_tx') %>%
 	drop_na()
 
 for (tx in tissues_to_use) {

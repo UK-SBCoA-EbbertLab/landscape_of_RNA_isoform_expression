@@ -5,7 +5,7 @@ library(tidyverse)
 h = 10
 w = 10
 cpm_vs_n_iso <- read_tsv('../../tables/GTEx_expression/GTEx_n_iso_diff_vs_gene_CPM.tsv') %>%
-	mutate(log_med_gene_cpm = log(median_gene_cpm))
+	mutate(log_med_gene_cpm = log2(median_gene_cpm))
 
 # plot the med gene CPM vs expressed isoforms
 ggplot(cpm_vs_n_iso, aes(y=n_tx, x=log_med_gene_cpm))+
@@ -47,8 +47,8 @@ ggplot(cpm_vs_n_iso %>% filter(gene_biotype == 'protein_coding'), aes(y=n_anno_t
 	facet_wrap(vars(tissue))
 ggsave('../../figures/M3_GTEx_n_isoforms_heatmap/GTEx_n_iso_anno_vs_gene_log_CPM_pc_genes.pdf', width=w, height=h)
 
-# plot med gene CPM vs annotated isoforms gt 5
-ggplot(cpm_vs_n_iso %>% filter(n_anno_tx > 5), aes(y=n_anno_tx, x=log_med_gene_cpm))+
+# plot med gene CPM vs annotated isoforms gt 5 #TODO: changed
+ggplot(cpm_vs_n_iso %>% filter(n_anno_tx > 5), aes(y=n_tx, x=log_med_gene_cpm))+
 	geom_jitter(alpha=0.1) +
 	geom_smooth() + 
 	facet_wrap(vars(tissue))
@@ -74,3 +74,13 @@ ggplot(cpm_threshold_gene_cpm_vs_n_iso, aes(y=n_tx, x=log_med_gene_cpm))+
 	facet_wrap(vars(tissue))
 ggsave('../../figures/M3_GTEx_n_isoforms_heatmap/GTEx_n_iso_observed_at_CPM_threshold_gt_5_in_at_least_one_tissue_vs_gene_log_CPM.pdf', width=w, height=h)
 
+
+ggplot(cpm_threshold_gene_cpm_vs_n_iso %>% filter(tissue == 'Heart - Left Ventricle'), aes(y=n_tx, x=log_med_gene_cpm))+
+	geom_jitter(alpha=0.1) +
+	geom_smooth() +
+	ggtitle('Heart - Left Ventricle') +
+	xlab('Gene Expression: Log2( Median Gene CPM + 1 )') +
+	ylab('Number of isoforms expressed per gene') +
+	theme(text = element_text(size=5))
+
+ggsave('../../figures/M3_GTEx_n_isoforms_heatmap/Heart_Left_Ventricle_scatter_plot.pdf', width=58, height=58, units='mm')
