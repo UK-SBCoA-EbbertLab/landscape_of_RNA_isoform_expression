@@ -1,6 +1,5 @@
 library(tidyverse)
 
-#TODO: give a better description
 # create tables containing information about number of isoforms per gene using total_unique_counts across all samples
 
 ######################################################################################
@@ -53,8 +52,12 @@ for (unique_counts_threshold in c(1,5,10,20)){
 		mutate(threshold = unique_counts_threshold)
 	combined_unique_n_tx <- bind_rows(combined_unique_n_tx, unique_n_tx)
 }
+
+# file contains information about the number of isoforms at different unique counts thresholds and different gene types
 write_tsv(values_at_thresholds_for_paper, '../../tables/GTEx_expression/unique_counts_all_samples_looking_at_at_least_10_25_or_60_isoforms_per_gene.tsv')
+# file contains information about the number of genes expressing n isoforms at the different thresholds
 write_tsv(combined_unique_n_tx, '../../tables/GTEx_expression/unique_counts_all_samples_across_thresholds_n_tx_and_n_genes.tsv')
+# file contains information about the number of isoforms a gene is expressing at different unique counts thresholds -- this one includes the gene ids
 write_tsv(unique_n_tx_per_gene %>%
 	arrange(threshold, n_tx), '../../tables/GTEx_expression/unique_counts_all_samples_across_thresholds_n_tx.tsv')
 

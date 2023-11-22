@@ -4,7 +4,7 @@ library(tidyverse)
 # get the current date and create a directory for it if it doesn't already exist
 the_date <- as.character(Sys.Date())
 print(the_date)
-if (!dir.exists(paste0('deseq_out/', the_date))) dir.create(paste0('deseq_out/', the_date))
+if (!dir.exists(paste0('../figures/deseq_out/', the_date))) dir.create(paste0('../figures/deseq_out/', the_date))
 
 ########## format data for DESeq2 ##################################
 # get sample_id into the correct format
@@ -98,8 +98,8 @@ a_plot <- ggplot(pcaData, aes(PC1, PC2, color = tissue_site_detail)) +
 	ylab(paste0("PC2: ",percentVar[2],"% variance")) +
 	coord_fixed()
 
-ggsave(paste0('deseq_out/', the_date, "/samps_all_isoforms_PCA_gtex.pdf"), plot=a_plot)
-ggsave("deseq_out/samps_all_isoforms_PCA_gtex.pdf", plot=a_plot)
+ggsave(paste0('../figures/deseq_out/', the_date, "/samps_all_isoforms_PCA_gtex.pdf"), plot=a_plot)
+ggsave("../figures/deseq_out/samps_all_isoforms_PCA_gtex.pdf", plot=a_plot)
 
 # list of samples that we are NOT using, due to low depth, replicates, or bad PCA clustering
 filter_out_samples = c(
@@ -188,8 +188,8 @@ f_plot <- ggplot(pcaData, aes(PC1, PC2, color = tissue_site_detail)) +
 	ylab(paste0("PC2: ",percentVar[2],"% variance")) +
 	coord_fixed()
 
-ggsave(paste0('deseq_out/', the_date, "/filtered_out_exp_and_rep_samps_all_isoforms_PCA_gtex.pdf"), plot=f_plot)
-ggsave("deseq_out/filtered_out_exp_and_rep_samps_all_isoforms_PCA_gtex.pdf", plot=f_plot)
+ggsave(paste0('../figures/deseq_out/', the_date, "/filtered_out_exp_and_rep_samps_all_isoforms_PCA_gtex.pdf"), plot=f_plot)
+ggsave("../figures/deseq_out/filtered_out_exp_and_rep_samps_all_isoforms_PCA_gtex.pdf", plot=f_plot)
 
 
 ############# Start DESeq2 - filter out all 'bad' samples #########################################
@@ -249,6 +249,6 @@ f_plot <- ggplot(pcaData, aes(PC1, PC2, color = tissue_site_detail)) +
 	ylab(paste0("PC2: ",percentVar[2],"% variance")) +
 	coord_fixed()
 
-ggsave(paste0('deseq_out/', the_date, "/filtered_samps_all_isoforms_PCA_gtex.pdf"), plot=f_plot)
-ggsave("deseq_out/filtered_samps_all_isoforms_PCA_gtex.pdf", plot=f_plot)
+ggsave(paste0('../figures/deseq_out/', the_date, "/filtered_samps_all_isoforms_PCA_gtex.pdf"), plot=f_plot)
+ggsave("../figures/deseq_out/filtered_samps_all_isoforms_PCA_gtex.pdf", plot=f_plot)
 
