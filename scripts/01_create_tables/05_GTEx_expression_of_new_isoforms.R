@@ -15,6 +15,8 @@ gtf_with_bambu <- read_tsv('../../nextflow_pipeline/references/Homo_sapiens_plus
 all_med_rel <- nrow(gtf_with_bambu)
 print(all_med_rel)
 
+write_tsv(gtf_with_bambu, 'TESTING_TESTING_1_2.tsv')
+
 # load in all the isoforms across 4 thresholds and filter for only Bambu
 # tell us the status of the isoforms and if they come from medically relevant genes
 # count how many tissues the isoform is expressed in across the thresholds
@@ -29,7 +31,7 @@ isoforms <- read_tsv('../../tables/GTEx_expression/GTEx_isoforms_in_tissues_pass
 
 write_tsv(isoforms, "../../tables/GTEx_expression_our_new_isoforms/GTEx_expression_of_new_isoforms.tsv")
 
-# Look at isoforms found in all 9 tissues and just 1 tissue
+# Look at isoforms found in all 9 tissues and in at least 1 tissue
 nine_tissues <- isoforms %>% 
 	select(!c(tissue, median_CPM)) %>%
 	filter(n_tissues == 9)
@@ -37,7 +39,36 @@ nine_tissues <- isoforms %>%
 write_tsv(nine_tissues, "../../tables/GTEx_expression_our_new_isoforms/tx_in_nine_gtex_tissues.tsv")
 
 one_tissue <- isoforms %>%
-	filter(n_tissues == 1)
+	filter(n_tissues >= 1)
 
-write_tsv(one_tissue, "../../tables/GTEx_expression_our_new_isoforms/tx_in_single_gtex_tissue.tsv")
+write_tsv(one_tissue, "../../tables/GTEx_expression_our_new_isoforms/tx_in_at_least_one_gtex_tissue.tsv")
+
+# prep DESeq2 tables
+isoforms <- read_tsv('../../tables/GTEx_expression/GTEx_isoforms_in_tissues_passing_med_CPM_gt_0_1_5_10.tsv') %>%
+	filter(grepl('Bambu', transcript_id))  %>%
+	mutate(status = ifelse(grepl('ENSG', gene_id), 'nfk', 'nfn')) %>%
+	mutate(is_med_rel = ifelse(gene_id %in% med_rel_ids, TRUE, FALSE))
+
+nine_deseq <- nine_tissues %>%
+	select(transcript_id, n_tissues, threshold) %>%
+	distinct() %>%
+	left_join(isoforms %>% filter(threshold == 0.01) %>% select(-threshold))
+
+
+write_tsv(nine_deseq, '../../tables/GTEx_expression_our_new_isoforms/deseq_input_housekeeping_genes.tsv')
+
+one_deseq <- one_tissue %>%
+	select(transcript_id, n_tissues, threshold) %>%
+	distinct() %>%
+	left_join(isoforms %>% filter(threshold == 0.01) %>% select(-threshold))
+write_tsv(one_deseq, '../../tables/GTEx_expression_our_new_isoforms/deseq_input_preferential_genes.tsv')
+
+write_tsv(bind_rows(nine_deseq, one_deseq), '../../tables/GTEx_expression_our_new_isoforms/deseq_input_housekeeping_and_preferential_genes.tsv')
+
+
+#median_CPM <- read_tsv('../../tables/GTEx_expression/GTEx_isoforms_in_tissues_passing_med_CPM_gt_1.tsv') %>%
+
+# look at CPM for medically relevant genes
+
+# look at CPM for new gene bodies
 
