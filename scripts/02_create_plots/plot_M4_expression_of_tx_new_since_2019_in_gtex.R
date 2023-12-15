@@ -107,8 +107,9 @@ ggsave('../../figures/M4_new_tx_since_2019_in_GTEx/M4_new_since_2019_in_gtex_by_
 
 # plot showing the relative abundance of new isoforms of the genes in each category
 perc_expr_df <- read_tsv('../../tables/GTEx_expression_since_2019/gtex_cpm_gt_1_relative_abundance_new_since_2019.tsv') %>%
+	replace(is.na(.), 0) %>%
 	mutate(Category = factor(Category, levels = bar_cat)) %>%
-	rename(rel_abund = `Relative Abundance of New Transcripts Since 2019 (%)`)
+	pivot_longer(!c(gene_id, gene_name, Category), names_to='Tissue', values_to='rel_abund')
 	
 ggplot(perc_expr_df, aes(x=Tissue, y=rel_abund, fill=Tissue)) +
 	geom_boxplot(outlier.shape = NA) +
@@ -175,7 +176,7 @@ ggplot(rel_abund_poster_children %>%
 	ggtitle("PAM")
 	
 ggplot(rel_abund_poster_children %>% 
-       filter(Category == 'Med-relevant new protein coding sequence') %>%
+       filter(Category == 'Med-relevant') %>%
        filter(gene_name == "KIF5A"), aes(x = rel_abund, y = Tissue, fill = Tissue)) +
 	geom_bar(stat = 'identity') +
 	scale_fill_manual(values = tiss_color) +

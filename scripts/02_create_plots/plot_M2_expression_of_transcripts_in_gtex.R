@@ -1,6 +1,6 @@
 library(tidyverse)
 library(scales)
-library(biomaRt)
+#library(biomaRt)
 library(ggupset)
 
 tissues_to_use = c("Brain - Cerebellar Hemisphere",
@@ -102,15 +102,20 @@ all_v_pc_tmp <- gtex_CPM_thresholds %>%
 	rowwise() %>%
 	mutate(leftover = all_transcript_median - cds_transcript_median) %>%
 	dplyr::select(tissue, cds_transcript_median, leftover) %>%
-	pivot_longer(!tissue, names_to = 'type', values_to = 'n_tx')
+	pivot_longer(!tissue, names_to = 'type', values_to = 'n_tx') %>%
+	mutate(type = factor(type, levels = c("cds_transcript_median", "leftover")))
+
+# Reorder the levels of 'type' factor
+all_v_pc_tmp$type <- factor(all_v_pc_tmp$type, levels = c("cds_transcript_median", "leftover"))
 
 ggplot(all_v_pc_tmp, aes(x=tissue, y=n_tx, fill=type)) +
 	geom_bar(position = 'fill', stat = 'identity') +
 #	theme(legend.position = 'top') +
 	scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) +
 	scale_fill_manual(
-            values = c("leftover" = '#f3766e', "cds_transcript_median" = '#18bdc2'),
-            labels = c("Other isoforms", "Protein-coding isoforms")
+            values = c("cds_transcript_median" = '#18bdc2', "leftover" = '#f3766e'),
+            #values = c("leftover" = '#f3766e', "cds_transcript_median" = '#18bdc2'),
+            labels = c("Protein-coding isoforms", "Other isoforms")
         ) +
 	theme(axis.text.x = element_text(angle = 45, hjust=1),
 	      axis.text = element_text(size=3),
@@ -129,15 +134,16 @@ ggsave('../../figures/M2_GTEx_expression/M2_gtex_cpm_thresholds_all_v_pc_proport
 # like a really really big venn diagram
 # looking at what isoforms are unique/shared between tissues, only looking at the top 20 categories
 iso_to_tiss <- read_tsv('../../tables/GTEx_expression/GTEx_isoforms_in_tissues_passing_med_CPM_gt_1.tsv') %>% 
+	select(!c(threshold)) %>%
 	pivot_longer(!c(transcript_id, gene_id, gene_name, gene_biotype), names_to = 'tissue', values_to = 'med_CPM') %>% 
-	drop_na() %>% 
+	drop_na(med_CPM) %>% 
 	group_by(transcript_id) %>%
         summarize(tissue = list(unique(tissue))) %>%
         ungroup()
 
 upset_plt <- ggplot(iso_to_tiss, aes(x=tissue)) + 
 	geom_bar() +
-	geom_text(stat='count', aes(label=after_stat(count)), vjust=-1) +
+#	geom_text(stat='count', aes(label=after_stat(count)), vjust=-1) +
 	scale_x_upset(n_intersections = 20) +
 	theme_combmatrix(
 			 combmatrix.panel.line.size = 0.5,
@@ -146,8 +152,34 @@ upset_plt <- ggplot(iso_to_tiss, aes(x=tissue)) +
 	ylab('Number of isoforms') +
 	theme(axis.text.y = element_text(size=2),
 	      axis.title = element_text(size=5))
-#ggsave('../../figures/M2_GTEx_expression/M2_GTEx_tissue_upset_plot.pdf', upset_plt, height = 58, width = 58 , units='mm')
+ggsave('../../figures/M2_GTEx_expression/M2_GTEx_tissue_upset_plot.pdf', upset_plt, height = 58, width = 58 , units='mm')
+
+upset_plt <- ggplot(iso_to_tiss, aes(x=tissue)) + 
+	geom_bar() +
+	geom_text(stat='count', aes(label=after_stat(count)), vjust=-1, size=2) +
+	scale_x_upset(n_intersections = 20) +
+	xlab('Tissue combinations') +
+	ylab('Number of isoforms') 
 ggsave('../../figures/M2_GTEx_expression/M2_GTEx_tissue_upset_plot_with_numbers.pdf', upset_plt)
+
+# upset plot but for genes
+gene_to_tiss <- read_tsv('../../tables/GTEx_expression/GTEx_isoforms_in_tissues_passing_med_CPM_gt_1.tsv') %>%
+        select(!c(threshold)) %>%
+        pivot_longer(!c(transcript_id, gene_id, gene_name, gene_biotype), names_to = 'tissue', values_to = 'med_CPM') %>%
+        drop_na(med_CPM) %>%
+	select(gene_id, gene_name, gene_biotype, tissue) %>%
+        group_by(gene_id) %>%
+        summarize(tissue = list(unique(tissue))) %>%
+        ungroup()
+
+upset_plt <- ggplot(gene_to_tiss, aes(x=tissue)) +
+        geom_bar() +
+        geom_text(stat='count', aes(label=after_stat(count)), vjust=-1, size=2) +
+        scale_x_upset(n_intersections = 20) +
+        xlab('Tissue combinations') +
+        ylab('Number of genes')
+ggsave('../../figures/M2_GTEx_expression/M2_GTEx_tissue_gene_upset_plot_with_numbers.pdf', upset_plt)
+
 
 ########################################################################################
 
@@ -176,13 +208,15 @@ all_v_pc_unique <- unique_to_tiss %>%
         rowwise() %>%
         mutate(leftover = all - pc) %>%
         dplyr::select(tissue, pc, leftover) %>%
-        pivot_longer(!tissue, names_to = 'type', values_to = 'n_tx')
+        pivot_longer(!tissue, names_to = 'type', values_to = 'n_tx') %>%
+        mutate(type = factor(type, levels = c("pc", "leftover")))
+
 
 ggplot(all_v_pc_unique, aes(x=tissue, y=n_tx, fill=type)) +
         geom_bar(position = 'fill', stat = 'identity') +
 	scale_fill_manual(
-            values = c("leftover" = '#f3766e', "pc" = '#18bdc2'),
-            labels = c("Other isoforms", "Protein-coding isoforms")
+            values = c("pc" = '#18bdc2', "leftover" = '#f3766e'),
+            labels = c("Protein-coding isoforms", "Other isoforms")
         ) +
 	scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) +
 	theme(axis.text.x = element_text(angle = 45, hjust=1),
@@ -203,10 +237,10 @@ tiss_color <- setNames(hue_pal()(length(tissues_to_use)), levels(as.factor(tissu
 # For each tissue, plot the number of isoforms expressed per gene (or protein-coding isoforms per gene) as a histogram
 n_tx_per_gene <- read_tsv('../../tables/GTEx_expression/GTEx_number_of_tx_per_gene_passing_thresholds_2023.tsv') %>%
 	pivot_longer(!c('gene_id', 'gene_biotype', 'gene_name'), names_to = 'tissue', values_to = 'n_tx') %>%
-	drop_na()
+	drop_na(n_tx)
 n_tx_per_pc_gene <- read_tsv('../../tables/GTEx_expression/GTEx_number_of_protein_coding_tx_per_gene_passing_thresholds_2023.tsv') %>%
 	pivot_longer(!c('gene_id', 'gene_biotype', 'gene_name'), names_to = 'tissue', values_to = 'n_tx') %>%
-	drop_na()
+	drop_na(n_tx)
 
 for (tx in tissues_to_use) {
 	print(tx)
@@ -225,11 +259,12 @@ for (tx in tissues_to_use) {
 		scale_fill_manual(values = tiss_color) +
 		xlab('Number of isoforms') +
 		ylab('Number of genes')
-	ggsave(paste0("../../figures/M2_GTEx_expression/M2_n_tx_per_gene_", tx, ".pdf"), width = 88, height = 58, units='mm')
+	ggsave(paste0("../../figures/M2_GTEx_expression/M2_n_tx_per_gene_", tx, ".pdf"), width = 88*2, height = 58*2, units='mm')
 
 	# looking at the number of protein-coding isoforms per gene
 	tmp_pc = n_tx_per_pc_gene %>% filter(tissue == tx)
 	print('pc isoforms from gene bodies')
+	print(tmp_pc %>% filter(n_tx >= 8))
 	# print the number of genes that express more than 10 protein-coding isoforms
 	print(nrow(tmp_pc %>% filter(n_tx >= 10)))
 	t_bins_pc = max(tmp_pc$n_tx)
@@ -241,7 +276,7 @@ for (tx in tissues_to_use) {
 		scale_fill_manual(values = tiss_color) +
 		xlab('Number of protein-coding isoforms') +
 		ylab('Number of genes')
-	ggsave(paste0("../../figures/M2_GTEx_expression/M2_n_pc_tx_per_gene_", tx, ".pdf"), width = 58, height = 26, units='mm')
+	ggsave(paste0("../../figures/M2_GTEx_expression/M2_n_pc_tx_per_gene_", tx, ".pdf"), width = 58*2, height = 26*2, units='mm')
 }
 ######################################################################################
 
@@ -259,7 +294,7 @@ for (unique_counts_threshold in c(1,5,10,20)){
 		xlab('Number of isoforms') +
 		ylab('Number of genes')
 
-	ggsave(paste0('../../figures/M2_GTEx_expression/n_tx_unique_counts_gt_', unique_counts_threshold, '.pdf'), plt, width = 11.5, height = 7)
+	ggsave(paste0('../../figures/M2_GTEx_expression/n_tx_unique_counts_gt_', unique_counts_threshold, '.pdf'), plt, width = 88*2, height = 58*2, units='mm')
 
 	zplt <- ggplot(unique_counts_n_tx %>% filter(threshold == unique_counts_threshold), aes(x=n_tx)) +
 		geom_histogram() +
@@ -267,8 +302,21 @@ for (unique_counts_threshold in c(1,5,10,20)){
 		ylim(0,125) +
 		xlab('Number of isoforms') +
 		ylab('Number of genes')
-	ggsave(paste0('../../figures/M2_GTEx_expression/n_tx_unique_counts_gt_', unique_counts_threshold, '_zoomed.pdf'), zplt, width = 8, height = 4)
+	ggsave(paste0('../../figures/M2_GTEx_expression/n_tx_unique_counts_gt_', unique_counts_threshold, '_zoomed.pdf'), zplt, width = 58*2, height = 26*2, units='mm')
 
 }
 
 ##########################################################################################
+############################ Transcript Biotype ##########################################
+
+biotype <- read_tsv('../../tables/GTEx_expression/GTEx_transcript_biotype_expr_by_tissue_2023.tsv') 
+
+ggplot(biotype, aes(x=reorder(transcript_biotype, -count), y=count, fill=transcript_biotype)) +
+	geom_bar(stat='identity') +
+	geom_text(mapping=aes(x=transcript_biotype, y=count, label = count), vjust = -0.2) +
+	facet_wrap(vars(tissue)) +
+	xlab('Transcript biotype') +
+	ylab('Number of isoforms') +
+	theme(legend.position='bottom',
+	      axis.text.x=element_blank())
+ggsave('../../figures/M2_GTEx_expression/GTEx_tissue_top_5_biotype.pdf', width=10,height=10)
