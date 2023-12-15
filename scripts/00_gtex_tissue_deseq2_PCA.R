@@ -118,7 +118,6 @@ filter_out_samples = c(
     "GTEX-1GN1W-0226-SM-7AGLJ_rep.FAK91654.bam", # heart - atrial appendage
     "GTEX-WY7C-1126-SM-3GS2X_rep2.FAK49168.bam", # heart - atrial appendage
     "GTEX-WY7C-1126-SM-3GS2X.FAK39149.bam", # heart - atrial appendage
-#    "GTEX-WY7C-1126-SM-3GS2X_rep.FAK49218.bam", # heart - atrial appendage 
     "GTEX-Y5LM-0426-SM-3YX99.FAK52212.bam", # liver
     "GTEX-Y5LM-0426-SM-3YX99_rep2.FAK41279.bam", # liver
     "GTEX-14BMU-0526-SM-5CA2F.FAK44778.bam", #lung
