@@ -8,4 +8,4 @@
 #SBATCH -o slurm-%j.out             # Output file for this job.
 #SBATCH -A coa_mteb223_uksr         # Project allocation account name (REQUIRED)
 
-singularity exec /project/mteb223_uksr/singularity_files/pathway_analysis_2023_10_30.sif Rscript 05x_all_new_isoforms_deseq2.R
+singularity exec /project/mteb223_uksr/singularity_files/pathway_analysis_2023_10_30.sif Rscript 05b_determine_housekeeping_and_preferential.R
