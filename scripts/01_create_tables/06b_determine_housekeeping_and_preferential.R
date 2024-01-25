@@ -12,24 +12,26 @@ hk_and_p <- read_tsv('../../tables/GTEx_expression_our_new_isoforms/deseq_output
 
 # for three thresholds, calculate the housekeeping isoforms
 for (thresh in c(1.01, 5.01, 10.01)) {
-	hk_deseq2 <- hk_iso %>%
-		filter(threshold == thresh) %>%
-		select(TXNAME, gene_name, gene_biotype) %>%
-		distinct() %>%
-		left_join(hk_and_p) %>%
-		distinct() %>%
-		filter(abs(log2FoldChange) < 1) %>%
-		group_by(TXNAME) %>%
-		mutate(n_not_sig = n())
-
-	write_tsv(hk_deseq2, paste0('../../tables/GTEx_expression_our_new_isoforms/deseq_output_all_new_isoforms_', thresh, '_housekeeping_all.tsv'))
+	for (lfc in c(1, 2)) {
+		hk_deseq2 <- hk_iso %>%
+			filter(threshold == thresh) %>%
+			select(TXNAME, gene_name, gene_biotype) %>%
+			distinct() %>%
+			left_join(hk_and_p) %>%
+			distinct() %>%
+			filter(abs(log2FoldChange) < lfc) %>%
+			group_by(TXNAME) %>%
+			mutate(n_not_sig = n())
 	
-	hk_deseq2 <- hk_deseq2 %>%
-		filter(n_not_sig > 30) %>%
-		select(TXNAME, gene_name, gene_biotype, n_not_sig) %>%
-		distinct()
-
-	write_tsv(hk_deseq2, paste0('../../tables/GTEx_expression_our_new_isoforms/deseq_output_all_new_isoforms_', thresh, '_housekeeping_filtered.tsv'))
+		write_tsv(hk_deseq2, paste0('../../tables/GTEx_expression_our_new_isoforms/deseq_output_all_new_isoforms_thresh_', thresh, '_lfc_', lfc, '_housekeeping_all.tsv'))
+		
+		hk_deseq2 <- hk_deseq2 %>%
+			filter(n_not_sig > 30) %>%
+			select(TXNAME, gene_name, gene_biotype, n_not_sig) %>%
+			distinct()
+	
+		write_tsv(hk_deseq2, paste0('../../tables/GTEx_expression_our_new_isoforms/deseq_output_all_new_isoforms_thresh_', thresh, '_lfc_', lfc, '_housekeeping_filtered.tsv'))
+	}
 }
 
 # prep for preferential isoform analysis, filter the threshold, logFold change and fdr
@@ -55,7 +57,8 @@ list_of_tibs <- p_deseq2 %>%
 # create a tibble to collect them
 preferential_isoforms <- tibble(
 				TXNAME = character(),
-				n_tis_pref = numeric())
+				n_tis_pref = numeric(),
+				tissues = character())
 
 # for each isoform tibble, determine if it has tissues where it is preferentially expressed
 for (tib in list_of_tibs) {
@@ -82,15 +85,18 @@ for (tib in list_of_tibs) {
 			if (nrow(pref_tissues) == 1 && unique(pref_tissues$Freq) == 8) {
 				preferential_isoforms <- preferential_isoforms %>% add_row(
 											   TXNAME=unique(tib$TXNAME),
-											   n_tis_pref=1)
-			} else if ((nrow(pref_tissues) == 2) && max(pref_tissues$Freq) < 7) {
+											   n_tis_pref=1,
+											   tissues = paste0(pref_tissues$tmp, collapse=','))
+			} else if ((nrow(pref_tissues) == 2) && max(pref_tissues$Freq) > 6) { #TODO: CHECK THIS <7 was the orig
 				preferential_isoforms <- preferential_isoforms %>% add_row(
 											   TXNAME=unique(tib$TXNAME),
-											   n_tis_pref=2)
+											   n_tis_pref=2,
+											   tissues = paste0(pref_tissues$tmp, collapse=','))
 			} else if (nrow(pref_tissues) == 3) {
 				preferential_isoforms <- preferential_isoforms %>% add_row(
 											   TXNAME=unique(tib$TXNAME),
-											   n_tis_pref=3)
+											   n_tis_pref=3,
+											   tissues = paste0(pref_tissues$tmp, collapse=','))
 			} else {
 				print('SKIPME')
 				print(unique(tib$TXNAME))
