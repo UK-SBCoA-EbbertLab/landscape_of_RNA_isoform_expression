@@ -288,21 +288,23 @@ for (tx in tissues_to_use) {
 # using 4 different thresholds: total unique counts > 1, 5, 10, and 20
 unique_counts_n_tx <- read_tsv('../../tables/GTEx_expression/unique_counts_all_samples_across_thresholds_n_tx.tsv')
 
-for (unique_counts_threshold in c(1,5,10,20)){
-	plt <- ggplot(unique_counts_n_tx %>% filter(threshold == unique_counts_threshold), aes(x=n_tx)) +
+y_axis <- c(125, 20, 15, 7)
+unique_counts_threshold <- c(1,5,10,20)
+for (i in c(1:4)){
+	plt <- ggplot(unique_counts_n_tx %>% filter(threshold == unique_counts_threshold[i]), aes(x=n_tx)) +
 		geom_histogram() +
 		xlab('Number of isoforms') +
 		ylab('Number of genes')
 
-	ggsave(paste0('../../figures/M2_GTEx_expression/n_tx_unique_counts_gt_', unique_counts_threshold, '.pdf'), plt, width = 88*2, height = 58*2, units='mm')
+	ggsave(paste0('../../figures/M2_GTEx_expression/n_tx_unique_counts_gt_', unique_counts_threshold[i], '.pdf'), plt, width = 88*2, height = 58*2, units='mm')
 
-	zplt <- ggplot(unique_counts_n_tx %>% filter(threshold == unique_counts_threshold), aes(x=n_tx)) +
+	zplt <- ggplot(unique_counts_n_tx %>% filter(threshold == unique_counts_threshold[i]), aes(x=n_tx)) +
 		geom_histogram() +
 		xlim(20,120) +
-		ylim(0,125) +
+		ylim(0,y_axis[i]) +
 		xlab('Number of isoforms') +
 		ylab('Number of genes')
-	ggsave(paste0('../../figures/M2_GTEx_expression/n_tx_unique_counts_gt_', unique_counts_threshold, '_zoomed.pdf'), zplt, width = 58*2, height = 26*2, units='mm')
+	ggsave(paste0('../../figures/M2_GTEx_expression/n_tx_unique_counts_gt_', unique_counts_threshold[i], '_zoomed.pdf'), zplt, width = 58*2, height = 26*2, units='mm')
 
 }
 

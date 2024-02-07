@@ -1,4 +1,5 @@
 library(tidyverse)
+set.seed(21)
 
 # number of isoforms in each category
 all_nfk = 428
@@ -337,6 +338,32 @@ ids_of_tx_for_mass_spec <- c('BambuTx1646',
 			     'BambuTx1758',
 			     'BambuTx2189')
 
+genes_CPM <- new_isoforms %>%
+        filter(grepl('Bambu', transcript_id)) %>%
+        filter(threshold == 0.01)
+
+
+ggplot(genes_CPM %>% mutate(med_cpm_log2 = log2(median_CPM +1)), aes(x=tissue, y=med_cpm_log2, fill = tissue)) +
+        geom_boxplot(outlier.shape=NA)+
+        geom_jitter(height=0, width = 0.15, aes(
+                                                color=ifelse(transcript_id %in% ids_of_tx_for_mass_spec, 'red','black'),
+                                                alpha=ifelse(transcript_id %in% ids_of_tx_for_mass_spec, 0.9, 0.2))) +
+        scale_color_identity() +
+        geom_text(aes(label=ifelse(transcript_id %in% ids_of_tx_for_mass_spec, paste0(gene_name,": ", transcript_id), '')), size=2, vjust=-0.2) +
+        scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) +
+        geom_hline(yintercept=log2(2),linetype='dotted', col = 'darkred') +
+        #theme(axis.text.x = element_text(angle = 45, hjust=1),
+        theme(axis.text.x = element_blank(),
+              legend.position='none')
+
+ggsave('../../figures/M5_our_new_isoforms_in_GTEx/median_log2_CPM+1_of_isoforms_from_genes.pdf', width=w, height=h)
+
+
+
+
+
+
+
 med_rel_genes_CPM <- new_isoforms %>%
 	filter(gene_id %in% med_rel_ids) %>%
 	filter(grepl('Bambu', transcript_id)) %>%
@@ -370,6 +397,15 @@ ggplot(med_rel_genes_CPM %>% mutate(med_cpm_log2 = log2(median_CPM +1)), aes(x=t
               legend.position='none')
 
 ggsave('../../figures/M5_our_new_isoforms_in_GTEx/median_log2_CPM+1_of_isoforms_from_medically_relevant_genes.pdf', width=w, height=h)
+
+## Preferential expression
+
+p_expr <- read_tsv('../../tables/GTEx_expression_our_new_isoforms/deseq_output_all_new_isoforms_1.01_preferential_filtered.tsv')
+
+ggplot(p_expr, aes(x=n_tis_pref)) +
+	geom_bar()
+
+
 q()
 #TODO: SKIPPING FOR NOW
 pdf('../../figures/M5_our_new_isoforms_in_GTEx/gtex_median_cpm_per_tissue.pdf', 15, 15, onefile=TRUE)

@@ -16,4 +16,21 @@ combined <- inner_join(n_tx_per_gene, n_tx_per_pc_gene)
 
 write_tsv(combined, '../../tables/GTEx_expression/GTEx_number_of_tx_per_gene_by_tissue.tsv')
 
+cereb_hem <- read_tsv('../../tables/GTEx_expression/GTEx_number_of_tx_per_gene_passing_thresholds_2023.tsv') %>%
+        pivot_longer(!c('gene_id', 'gene_biotype', 'gene_name'), names_to = 'tissue', values_to = 'n_tx') %>%
+	filter(tissue == 'Brain - Cerebellar Hemisphere') %>%
+	drop_na(n_tx) %>%
+	arrange(n_tx)
+
+write_tsv(cereb_hem, '../../tables/GTEx_expression/cerebellarHemisphere_n_tx_per_gene.tsv')
+
+cereb_hem_pc <- read_tsv('../../tables/GTEx_expression/GTEx_number_of_protein_coding_tx_per_gene_passing_thresholds_2023.tsv') %>%
+        pivot_longer(!c('gene_id', 'gene_biotype', 'gene_name'), names_to = 'tissue', values_to = 'n_tx') %>%
+        filter(tissue == 'Brain - Cerebellar Hemisphere') %>%
+        drop_na(n_tx) %>%
+        arrange(n_tx)
+
+write_tsv(cereb_hem_pc, '../../tables/GTEx_expression/cerebellarHemisphere_n_pc_tx_per_gene.tsv')
+
+
 
