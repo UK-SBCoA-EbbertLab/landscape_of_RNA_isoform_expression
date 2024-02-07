@@ -1,0 +1,89 @@
+Bootstrap: docker
+From: ubuntu:22.04
+
+%post
+
+
+        ## Make Shell Noninteractive ##
+        DEBIAN_FRONTEND=noninteractive
+
+        ## Install basic packages and get update
+        apt-get update && apt-get -y install wget locales sudo libarchive-dev
+
+        ## Set timezone and language for container ##
+        ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
+
+        export LANGUAGE=en_US.UTF-8
+        export LANG=en_US.UTF-8
+        export LC_ALL=en_US.UTF-8
+        sudo locale-gen en_US.UTF-8
+
+        echo 'export LANGUAGE="en_US.UTF8"' >> $SINGULARITY_ENVIRONMENT
+        echo 'export LANG="en_US.UTF8"' >> $SINGULARITY_ENVIRONMENT
+        echo 'export LC_ALL="en_US.UTF8"' >> $SINGULARITY_ENVIRONMENT
+
+
+    	## Install miniconda ##
+	cd /
+	wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+        bash Miniconda3-latest-Linux-x86_64.sh -bfp /conda
+	export PATH="/conda/bin:$PATH"
+    	echo 'export PATH="/conda/bin:$PATH"' >> $SINGULARITY_ENVIRONMENT
+	conda config --add channels bioconda
+	conda config --add channels conda-forge
+        conda config --add channels nanoporetech
+
+	## Install Mamba ##
+	conda install -c conda-forge --override-channels mamba
+
+	## Install Python 3.9 through Mamba ##
+	mamba install -y -c conda-forge --override-channels python=3.9
+
+	## Install Pychopper ##
+	mamba install -y -c nanoporetech pychopper=2.7.6
+
+	## Install StringTie, GFFread, GFFcompare, SamTools, MiniMap2 ##
+        mamba install -y -c bioconda stringtie gffread gffcompare samtools minimap2
+
+%test
+		
+	## Check if installations are on path and/or display their versions ##
+	conda --version
+	mamba --version
+	gffread --version
+	python --version
+	pip --version
+	samtools --version
+	minimap2 --version
+	which pychopper
+	gffcompare --version
+	
+	
+%labels
+	author Bernardo Aguzzoli Heberle
+	version v0.1.0
+
+%help
+	This is the singularity container used to run the nextflow pipelines found at: https://github.com/UK-SBCoA-EbbertLab/new_RNA_isoform_expression_across_tissues
+
+	Software included in the container are:
+
+	conda==23.5.2
+	mamba==1.4.9
+	pip==23.1.2
+	python==3.9.16
+	pychopper==2.7.6
+	gffcompare==0.12.6
+	samtools==1.17
+	stringtie==2.2.1
+	gffread==0.12.7
+	minimap2==2.26-r1175
+
+        NOTE THAT VERSIONS OF THE SOFTWARE INSTALLED WILL CHANGE THROUGH TIME IF YOU BUILD THE IMAGE FROM THE RECIPE FILE.
+        TO GET THE ORIGINAL VERSION OF THIS CONTAINER PULL IT FROM THE SINGULARITY LIB WITH THE COMMAND:  
+	
+	singularity pull --arch amd64 library://ebbertlab/nanopore_cdna/nanopore:sha256.1e78cf38407f51f1742a996adcb6bed9019e103ffd830fa210fa0194014b5064
+	
+
+	For more information about the use of this singularity container access: https://github.com/UK-SBCoA-EbbertLab/new_RNA_isoform_expression_across_tissues
+
