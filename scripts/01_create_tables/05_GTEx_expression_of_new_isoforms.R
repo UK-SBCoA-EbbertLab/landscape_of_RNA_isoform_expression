@@ -65,17 +65,7 @@ passing_thresh <- one_tissue %>%
         distinct() %>%
 	summarize(n_isoforms = n())
 
-passing_low_thresh <- one_tissue %>%
-        mutate(n_tissues = as.character(n_tissues)) %>%
-        mutate(threshold = as.character(threshold)) %>%
-        filter(threshold == 0.01) %>%
-        filter(status == 'nfk') %>%
-        drop_na(median_CPM) %>%
-        select(transcript_id, gene_id, tissue) %>%
-        distinct() %>%
-	group_by(tissue) %>%
-        summarize(n_isoforms = n())
-
+#####################################################################
 
 # prep DESeq2 tables
 isoforms <- read_tsv('../../tables/GTEx_expression/GTEx_isoforms_in_tissues_passing_med_CPM_gt_0_1_5_10.tsv') %>%
