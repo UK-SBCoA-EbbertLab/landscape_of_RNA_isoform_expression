@@ -125,7 +125,7 @@ From: ubuntu:22.04
         NOTE THAT VERSIONS OF THE SOFTWARE INSTALLED MAY CHANGE THROUGH TIME IF YOU BUILD THE IMAGE FROM THE RECIPE FILE.
         TO GET THE ORIGINAL VERSION OF THIS CONTAINER PULL IT FROM THE SINGULARITY LIB WITH THE COMMAND:
 
-	singularity pull --arch amd64 library://ebbertlab/nanopore_cdna/bernardo_article_analysis:2023-07-13
+	pull command: singularity pull --arch amd64 library://ebbertlab/nanopore_cdna/bernardo_article_analysis:sha256.bdd920de92d66d33b8a51398a6f6a5dbdb81c10accc8b841e110edd0a1730486
 
 	
 	For more information about the use of this singularity container access: https://github.com/UK-SBCoA-EbbertLab/new_RNA_isoform_expression_across_tissues
