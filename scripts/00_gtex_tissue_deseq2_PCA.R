@@ -99,7 +99,8 @@ a_plot <- ggplot(pcaData, aes(PC1, PC2, color = tissue_site_detail)) +
 	coord_fixed()
 
 ggsave(paste0('../figures/deseq_out/', the_date, "/samps_all_isoforms_PCA_gtex.pdf"), plot=a_plot)
-ggsave("../figures/deseq_out/samps_all_isoforms_PCA_gtex.pdf", plot=a_plot)
+#ggsave("../figures/deseq_out/samps_all_isoforms_PCA_gtex.pdf", plot=a_plot)
+
 
 # list of samples that we are NOT using, due to low depth, replicates, or bad PCA clustering
 filter_out_samples = c(
@@ -188,7 +189,7 @@ f_plot <- ggplot(pcaData, aes(PC1, PC2, color = tissue_site_detail)) +
 	coord_fixed()
 
 ggsave(paste0('../figures/deseq_out/', the_date, "/filtered_out_exp_and_rep_samps_all_isoforms_PCA_gtex.pdf"), plot=f_plot)
-ggsave("../figures/deseq_out/filtered_out_exp_and_rep_samps_all_isoforms_PCA_gtex.pdf", plot=f_plot)
+#ggsave("../figures/deseq_out/filtered_out_exp_and_rep_samps_all_isoforms_PCA_gtex.pdf", plot=f_plot)
 
 
 ############# Start DESeq2 - filter out all 'bad' samples #########################################
@@ -249,5 +250,56 @@ f_plot <- ggplot(pcaData, aes(PC1, PC2, color = tissue_site_detail)) +
 	coord_fixed()
 
 ggsave(paste0('../figures/deseq_out/', the_date, "/filtered_samps_all_isoforms_PCA_gtex.pdf"), plot=f_plot)
-ggsave("../figures/deseq_out/filtered_samps_all_isoforms_PCA_gtex.pdf", plot=f_plot)
+#ggsave("../figures/deseq_out/filtered_samps_all_isoforms_PCA_gtex.pdf", plot=f_plot)
+
+#####################ADDED 4/3 TO SEE MORE PC #####################################
+#pcs <- prcomp(t(assay(vsd)))
+#percVar <- round(100 * pcs$sdev^2 / sum(pcs$sdev^2))
+#
+#pcaDataFrame <- data.frame(PC1 = pcs$x[,1],
+#			   PC2 = pcs$x[,2],
+#			   PC3 = pcs$x[,3],
+#			   PC4 = pcs$x[,4],
+#			   PC5 = pcs$x[,5],
+#			   PC6 = pcs$x[,6],
+#			   tissue_site_detail = colData(dds)$tissue_site_detail)
+#
+#pdf("multiple_pca_plots.pdf", width = 7, height= 10)
+## Plotting the first and third PCs, for example
+#a_plot <- ggplot(pcaDataFrame, aes(PC1, PC2, color = tissue_site_detail)) +
+#          geom_point() +
+#          xlab(paste0("PC1: ", percVar[1], "% variance")) +
+#          ylab(paste0("PC2: ", percVar[2], "% variance")) +
+#          coord_fixed()
+#print(a_plot)
+#
+#
+## Plotting the first and third PCs, for example
+#b_plot <- ggplot(pcaDataFrame, aes(PC2, PC3, color = tissue_site_detail)) +
+#          geom_point() +
+#          xlab(paste0("PC2: ", percVar[2], "% variance")) +
+#          ylab(paste0("PC3: ", percVar[3], "% variance")) +
+#          coord_fixed()
+#print(b_plot)
+#
+## Plotting the first and third PCs, for example
+#c_plot <- ggplot(pcaDataFrame, aes(PC1, PC3, color = tissue_site_detail)) +
+#          geom_point() +
+#          xlab(paste0("PC1: ", percVar[1], "% variance")) +
+#          ylab(paste0("PC3: ", percVar[3], "% variance")) +
+#          coord_fixed()
+#print(c_plot)
+#
+## Plotting the first and third PCs, for example
+#d_plot <- ggplot(pcaDataFrame, aes(PC4, PC1, color = tissue_site_detail)) +
+#          geom_point() +
+#          xlab(paste0("PC4: ", percVar[4], "% variance")) +
+#          ylab(paste0("PC1: ", percVar[1], "% variance")) +
+#          coord_fixed()
+#print(d_plot)
+#
+#dev.off()
+
+
+##################################################################################
 

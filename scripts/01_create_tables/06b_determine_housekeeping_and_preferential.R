@@ -1,5 +1,11 @@
 library(tidyverse)
 
+gini_gene <- read_tsv('gini_gene_lists_GTEx.txt') %>%
+	select(Genes) %>% 
+	rename(gene_name = Genes) %>%
+	mutate(isGiniGene = TRUE)
+
+
 # load in list of tissues that we are considering for 'housekeeping' and for 'preferential' 
 hk_iso <- read_tsv('../../tables/GTEx_expression_our_new_isoforms/tx_in_nine_gtex_tissues.tsv') %>%
 	unite('TXNAME', c(transcript_id, gene_id))
@@ -28,9 +34,10 @@ for (thresh in c(1.01, 5.01, 10.01)) {
 		hk_deseq2 <- hk_deseq2 %>%
 			filter(n_not_sig > 30) %>%
 			select(TXNAME, gene_name, gene_biotype, n_not_sig) %>%
-			distinct()
+			distinct() %>%
+			left_join(gini_gene)
 	
-		write_tsv(hk_deseq2, paste0('../../tables/GTEx_expression_our_new_isoforms/deseq_output_all_new_isoforms_thresh_', thresh, '_lfc_', lfc, '_housekeeping_filtered.tsv'))
+		write_tsv(hk_deseq2, paste0('../../tables/GTEx_expression_our_new_isoforms/deseq_output_all_new_isoforms_thresh_', thresh, '_lfc_', lfc, '_housekeeping_filtered_with_gini_gene.tsv'))
 	}
 }
 

@@ -100,7 +100,11 @@ gtex_metadata = as.data.frame(gtex_metadata)
 	print(dds)
 	genes_to_keep <- which(grepl('Bambu', rownames(dds)))
 	dds <- dds[genes_to_keep, ]
-	print(dds)
+
+	#added after original submission #############
+	write_tsv(as.data.frame(counts(dds, normalized=TRUE)) %>% rownames_to_column('transcript_id'), 'deseq2_normalized_values_bambu_iso.tsv')
+
+	##############################################
 
 	# to write out pairwise 
 	all_the_results <- tibble()
@@ -122,6 +126,7 @@ gtex_metadata = as.data.frame(gtex_metadata)
 		}
 	}
 	write_tsv(all_the_results %>%
-		  arrange(TXNAME), paste0('../../tables/GTEx_expression_our_new_isoforms/deseq_output_all_new_isoforms.tsv'))
+		  arrange(TXNAME), paste0('../../tables/GTEx_expression_our_new_isoforms/deseq_output_all_new_isoforms_after_submission.tsv'))
+		  #arrange(TXNAME), paste0('../../tables/GTEx_expression_our_new_isoforms/deseq_output_all_new_isoforms.tsv'))
 
 
