@@ -2,7 +2,7 @@
 
 `./cemetery/` - Directory containing old scripts no longer being used
 
-`./00_*` - Files beginning with this were used in determining which samples to use in downstream analysis, or to get some stats about the samples
+`./00_*` - Files beginning with this were used in determining which samples to use in downstream analysis, or to get some stats about the samples. See the Sample inclusion criteria section of our paper under the Methods. 
 
 `./01_create_tables/` - Directory containing scripts used to create the intermediate and final tables
 

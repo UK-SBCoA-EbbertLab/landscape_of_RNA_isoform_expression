@@ -1,0 +1,80 @@
+Bootstrap: docker
+From: ubuntu:22.04
+
+%files
+
+%environment
+	MACHTYPE=x86_64
+        export MACHTYPE
+	export PATH=/usr/local/bin:$PATH
+	export PATH="$PATH:/bin/$MACHTYPE"
+	export PATH="$PATH:/usr/local/"
+	export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+	
+
+%labels
+
+    AUTHOR madeline.page@uky.edu
+    Maintainer "Madeline Page"
+
+%post
+
+    echo "The post section is where you can install, and configure your container."
+    apt-get update -y -o Acquire::ForceIPv4=true
+    #DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata
+    DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
+    DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential
+
+    apt-get install -y wget gnupg git git-lfs python3 default-jdk gawk
+    apt-get install -y python3-pip python-is-python3
+    apt-get install -y libcurl4-openssl-dev
+    pip3 install biopython mgzip numpy pandas
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+    apt install software-properties-common -y
+#    add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/'
+    add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu jammy-cran40/'
+    echo "BEHOLD THE R AVAliABILITIES"
+    apt-cache policy r-base
+    apt-cache policy r-base-core
+    echo "It is finished"
+    #DEBIAN_FRONTEND=noninteractive apt-get install r-recommended=4.2.3 r-base=4.2.3 r-base-dev -y
+    DEBIAN_FRONTEND=noninteractive apt-get install r-base-core=4.3.1-4.2204.0 r-base-dev -y
+	apt-get install -y autoconf automake make gcc perl zlib1g-dev libbz2-dev liblzma-dev libcurl4-gnutls-dev libssl-dev libncurses5-dev graphviz
+
+	cd /usr/local
+	wget https://mafft.cbrc.jp/alignment/software/mafft-7.505-without-extensions-src.tgz
+	gunzip -cd mafft-7.505-without-extensions-src.tgz | tar xfv -
+	cd mafft-7.505-without-extensions/core
+	make clean
+	make
+	make install
+	
+	cd ../../
+
+	#########################################
+	# Install R stuff
+	#########################################
+	apt-get -o Acquire::ForceIPv4=true update
+#	apt-get install -y r-base r-base-dev
+#	apt-get install -y r-base-core=4.2.3-1.2004.0
+	apt-get install -y r-cran-rmarkdown pandoc libopenblas-dev libcurl4-openssl-dev libopenmpi-dev openmpi-bin openmpi-common openmpi-doc openssh-client openssh-server libssh-dev vim cmake gfortran g++ curl autoconf bzip2 libtool libtool-bin libcurl4-openssl-dev libxml2-dev libfontconfig1-dev
+
+
+	R --slave -e 'install.packages(c("BiocManager", "rmarkdown", "tidyverse", "devtools", "Hmisc", "ggupset"), repos="https://cloud.r-project.org/")'
+	R --slave -e 'BiocManager::install(c("reshape2","ggplot2", "pheatmap", "data.table", "org.Hs.eg.db", "GenVisR", "TxDb.Hsapiens.UCSC.hg38.knownGene", "BSgenome.Hsapiens.UCSC.hg38", "WGCNA", "biomaRt", "MSnbase", "DESeq2", "ggarrange", "ggpubr"))'
+
+
+	export MACHTYPE=x86_64
+	export PATH="$PATH:/bin/$MACHTYPE"
+
+
+%help
+    A baseline container of ubuntu:20.04 - transcript pathway analysis
+        
+	Software included:
+	
+	R==4.3.1	
+		tidyverse==2.0.0
+		DESeq2==1.42.0
+
+
