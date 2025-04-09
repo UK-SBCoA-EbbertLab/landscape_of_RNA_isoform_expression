@@ -1,0 +1,63 @@
+Bootstrap: library 
+From: ebbertlab/ebbert_lab_base_environment/ebbert_lab_base_environment:sha256.4b7779c4e7a1d7e8a38159cfe302b5cdb025398f43537a4cc3b703f1fb4bf1b4
+
+%files
+	/home/mlpa241/signalp-6.0_license.txt /usr/local/signalp-6.0_license.txt
+	/home/mlpa241/signalp-6.0h.fast.tar.gz /usr/local/signalp-6.0h.fast.tar.gz
+	/home/mlpa241/iupred2a.tar.gz /usr/local/iupred2a.tar.gz
+
+%environment
+	. /opt/conda/etc/profile.d/conda.sh
+	conda activate
+	export PATH="$PATH:/usr/local/iupred2a"
+	export PATH="$PATH:/usr/local/signalp-6.0h/bin"
+	export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+
+%labels
+
+    AUTHOR madeline.page@uky.edu
+    Maintainer "Madeline Page"
+
+%post
+
+    	## Install miniconda ##
+	wget https://repo.anaconda.com/miniconda/Miniconda3-py312_24.11.1-0-Linux-x86_64.sh
+	bash Miniconda3-py312_24.11.1-0-Linux-x86_64.sh -b -f -p /opt/conda
+	rm Miniconda3-py312_24.11.1-0-Linux-x86_64.sh
+
+	. /opt/conda/etc/profile.d/conda.sh
+
+	conda activate
+	conda install python=3.10.13 pytorch=1.13.1
+	
+	echo "conda 24.11.3" >> /opt/conda/conda-meta/pinned
+	pip install torch==1.13.1+cpu torchvision==0.14.1+cpu torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cpu mgzip biopython numpy pandas matplotlib polars tqdm pybiolib
+	
+	cd /usr/local
+
+	#########################################
+	# INSTALL IUPRED2
+	#########################################
+	tar -xvzf iupred2a.tar.gz 
+	# run with python iupred2a.py (options) (sequence file) (iupred2 type)	
+
+	cd /usr/local
+
+	#########################################
+	# INSTALL SIGNALP
+	#########################################
+	tar -xvzf signalp-6.0h.fast.tar.gz
+	cd signalp6_fast/
+	pip install signalp-6-package/
+
+	SIGNALP_DIR=$(python -c "import signalp; import os; print(os.path.dirname(signalp.__file__))" )
+	cp -r signalp-6-package/models/* $SIGNALP_DIR/model_weights/
+
+	
+%help
+
+	- singularity exec /location/to/ISAR_software_do_not_distribute.sif signalp -fasta input_protein_fasta.fasta -prefix output_prefix
+	- singularity exec /location/to/ISAR_software_do_not_distribute.sif python /usr/local/iupred2a/iupred2a.py (options) input_protein_fasta.fasta(iupred2 type; long, short, or glob)
+	
+
+

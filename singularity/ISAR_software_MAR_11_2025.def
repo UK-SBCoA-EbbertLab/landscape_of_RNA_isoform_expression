@@ -1,0 +1,116 @@
+Bootstrap: library 
+From: ebbertlab/ebbert_lab_base_environment/ebbert_lab_base_environment:sha256.4b7779c4e7a1d7e8a38159cfe302b5cdb025398f43537a4cc3b703f1fb4bf1b4
+
+%environment
+	export PATH=$PATH:/usr/local/hmmer3/bin
+	export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+        export PERL5LIB=/usr/local/PfamScan:$PERL5LIB
+	. /opt/conda/etc/profile.d/conda.sh
+	conda activate
+
+%labels
+
+	AUTHOR madeline.page@uky.edu
+	Maintainer "Madeline Page"
+
+%post
+
+    	## Install miniconda ##
+	wget https://repo.anaconda.com/miniconda/Miniconda3-py312_24.11.1-0-Linux-x86_64.sh
+	bash Miniconda3-py312_24.11.1-0-Linux-x86_64.sh -b -f -p /opt/conda
+	rm Miniconda3-py312_24.11.1-0-Linux-x86_64.sh
+
+	. /opt/conda/etc/profile.d/conda.sh
+
+	conda activate
+	conda install python=3.10.13
+	
+	echo "conda 24.11.3" >> /opt/conda/conda-meta/pinned
+
+	conda install biopython numpy pandas 
+	pip install pybiolib polars mgzip pypgatk 
+
+        ## Install R ##
+	sudo apt-get update
+	sudo apt-get install -y --no-install-recommends software-properties-common dirmngr
+	wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | sudo gpg --dearmor -o /usr/share/keyrings/r-project.gpg
+	echo "deb [signed-by=/usr/share/keyrings/r-project.gpg] https://cloud.r-project.org/bin/linux/ubuntu jammy-cran40/" | sudo tee -a /etc/apt/sources.list.d/r-project.list
+	sudo apt-get update
+	sudo apt-get install -y r-base r-base-core r-recommended r-base-dev        
+
+
+	## Install R Packages ##
+	R --slave -e 'install.packages(c("Rcpp", "progress", "BiocManager", "rmarkdown", "tidyverse", "devtools"), repos="https://cloud.r-project.org/")'
+	R --slave -e 'BiocManager::install(c("data.table", "edgeR", "DESeq2", "DEXSeq", "IsoformSwitchAnalyzeR", "sva"))'
+
+	#########################################
+	## Install CPAT ##
+	#########################################
+	cd /usr/local
+	pip install CPAT
+	mkdir cpat_files
+	cd cpat_files
+	wget -O Human_logitModel.RData https://sourceforge.net/projects/rna-cpat/files/prebuilt_models/Human_logitModel.RData/download
+	wget -O Human_cutoff.txt https://sourceforge.net/projects/rna-cpat/files/prebuilt_models/Human_cutoff.txt/download
+	wget -O Human_Hexamer.tsv https://sourceforge.net/projects/rna-cpat/files/prebuilt_models/Human_Hexamer.tsv/download
+
+	#########################################
+	# INSTALL CPC2 
+	#########################################
+	cd /usr/local
+	wget https://github.com/gao-lab/CPC2_standalone/archive/refs/tags/v1.0.1.tar.gz
+	gzip -dc v1.0.1.tar.gz | tar xf -
+	rm v1.0.1.tar.gz
+	cd CPC2_standalone-1.0.1
+	cd libs/libsvm
+	gzip -dc libsvm-3.18.tar.gz | tar xf -
+	cd libsvm-3.18
+	make clean && make
+
+	## HOW TO RUN
+	# python /usr/local/CPC2_standalone-1.0.1/bin/CPC2.py -i input.fa -o output.txt
+
+
+	########################################
+	# INSTALL PFAM 
+	########################################
+	apt-get install -y autoconf automake make gcc perl cpanminus zlib1g-dev libbz2-dev liblzma-dev libcurl4-gnutls-dev libssl-dev libncurses5-dev graphviz
+	apt-get clean
+
+        cd /usr/local
+        wget ftp://ftp.ebi.ac.uk/pub/databases/Pfam/Tools/PfamScan.tar.gz
+        tar -xzf PfamScan.tar.gz
+        cd PfamScan
+
+        wget http://eddylab.org/software/hmmer/hmmer-3.4.tar.gz
+        tar zxvf hmmer-3.4.tar.gz
+        cd hmmer-3.4
+        ./configure CC=gcc LDFLAGS="-static" --prefix=/usr/local/hmmer3
+        make
+        make check
+        make install
+	export PATH=$PATH:/usr/local/hmmer3/bin
+
+        cpanm Moose
+        cpanm --force Bio::Perl
+
+        export PERL5LIB=/usr/local/PfamScan:$PERL5LIB
+
+        cd /usr/local/PfamScan
+        wget ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz
+        wget ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.dat.gz
+        wget ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/active_site.dat.gz
+        gunzip Pfam-A.hmm.gz Pfam-A.hmm.dat.gz active_site.dat.gz
+
+        /usr/local/hmmer3/bin/hmmpress Pfam-A.hmm
+
+	## How to run
+	# /usr/local/PfamScan/pfam_scan.pl -fasta proteinSequenceTest.fasta -dir /usr/local/PfamScan/
+
+
+#    echo "BEHOLD THE R AVAliABILITIES"
+#    apt-cache policy r-base
+#    apt-cache policy r-base-core
+#    echo "It is finished"
+#    #DEBIAN_FRONTEND=noninteractive apt-get install r-recommended=4.2.3 r-base=4.2.3 r-base-dev -y
+

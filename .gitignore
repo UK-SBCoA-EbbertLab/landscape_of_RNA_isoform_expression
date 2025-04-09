@@ -1,4 +1,8 @@
 **/*.RDS
+**/*.RData
+**/biolib_results
+**/z_output
+**/*.log
 **/*.gtf
 **/data/
 nextflow_pipeline/workflow/work/
@@ -6,6 +10,7 @@ nextflow_pipeline/workflow/results/
 **/*.sif
 **/*.bed
 **/*.fa
+**/*.fasta
 **/*.pdf
 **/*.tsv
 **/*.txt

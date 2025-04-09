@@ -1,0 +1,44 @@
+Bootstrap: library 
+From: ebbertlab/ebbert_lab_base_environment/ebbert_lab_base_environment:sha256.4b7779c4e7a1d7e8a38159cfe302b5cdb025398f43537a4cc3b703f1fb4bf1b4
+
+%files
+	/home/mlpa241/deeploc-2.1.All.tar.gz /usr/local/deeploc-2.1.All.tar.gz
+	/home/mlpa241/deeploc-2.1_license.txt /usr/local/license/deeploc-2.1_license.txt
+
+%environment
+	. /opt/conda/etc/profile.d/conda.sh
+	conda activate
+
+%labels
+
+    AUTHOR madeline.page@uky.edu
+    Maintainer "Madeline Page"
+
+%post
+
+    	## Install miniconda ##
+	wget https://repo.anaconda.com/miniconda/Miniconda3-py312_24.11.1-0-Linux-x86_64.sh
+	bash Miniconda3-py312_24.11.1-0-Linux-x86_64.sh -b -f -p /opt/conda
+	rm Miniconda3-py312_24.11.1-0-Linux-x86_64.sh
+
+	. /opt/conda/etc/profile.d/conda.sh
+
+	conda activate
+	conda install python=3.10.13
+	
+	echo "conda 24.11.3" >> /opt/conda/conda-meta/pinned
+	pip install biopython numpy pandas matplotlib polars tqdm pybiolib
+	
+	cd /usr/local
+
+	#########################################
+	# INSTALL DEEPLOC
+	#########################################
+        pip install deeploc-2.1.All.tar.gz
+
+
+%help
+
+	- singularity exec /location/to/ISAR_software_do_not_distribute.sif deeploc2 -f protein_fasta.fasta -o output_folder_name -m Accurate
+
+

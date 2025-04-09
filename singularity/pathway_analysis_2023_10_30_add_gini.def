@@ -1,0 +1,20 @@
+Bootstrap: library
+From: ebbertlab/rna_landscape/pathway_analysis_2023_10_30:sha256.0e40b823a8f25fbbf301b6b12e724145ab790909070fb229b35caa7a46a35bc9
+
+%files
+
+%environment
+
+%labels
+
+    AUTHOR madeline.page@uky.edu
+    Maintainer "Madeline Page"
+
+%post
+
+	R --slave -e 'install.packages(c("DescTools"), repos="https://cloud.r-project.org/")'
+
+%help
+	added DescTools to the container
+
+
