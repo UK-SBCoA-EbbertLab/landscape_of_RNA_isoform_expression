@@ -8,4 +8,4 @@
 #SBATCH -o slurm-%j.out             # Output file for this job.
 #SBATCH -A coa_mteb223_uksr         # Project allocation account name (REQUIRED)
 
-singularity exec singlarity_containers/ISAR_software_MAR_11_2025.sif Rscript 31_ISAR_part2.R z_output/ISAR_part1_object.RData z_output/cpat3_output.formatted.tsv z_output/pfam_output.txt z_output/combined_iupred2a_output.txt z_output/prediction_results.txt z_output/deeploc2_output_formatted.tsv z_output/biolib_results/TMRs.gff3 
+singularity exec singlarity_containers/ISAR_software_MAR_11_2025.sif Rscript 31a_ISAR_part2.R z_output/ISAR_part1_object.RData z_output/cpat3_output.formatted.tsv z_output/pfam_output.txt z_output/combined_iupred2a_output.txt z_output/prediction_results.txt z_output/deeploc2_output_formatted.tsv z_output/biolib_results/TMRs.gff3 

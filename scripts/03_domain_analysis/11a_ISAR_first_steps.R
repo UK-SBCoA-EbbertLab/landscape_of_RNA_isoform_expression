@@ -35,8 +35,11 @@ mySwitchList <- importRdata(countsMatrix,
 mySwitchList <- preFilter(
 				mySwitchList,
 				geneExpressionCutoff = NULL,
-				isoformExpressionCutoff = 1,
-				removeSingleIsoformGenes = TRUE)
+				#isoformExpressionCutoff = 0.5,
+				isoformExpressionCutoff = 1, # original value
+				IFcutoff = NULL,
+				removeSingleIsoformGenes = TRUE,
+				keepIsoformInAllConditions = TRUE)
 
 # Identify isoform switches
 mySwitchList <- isoformSwitchTestSatuRn(
