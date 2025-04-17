@@ -27,10 +27,19 @@ guppy.def - definition file for singularity container used to run guppy basecall
 
 
 
-2023-07-13_bernardo_article_analysis.def - definition file for singularity container used to make figures and tables
+2023-07-13_bernardo_article_analysis.def - definition file for singularity container used to make some tables
 
 `pull command: singularity pull --arch amd64 library://ebbertlab/nanopore_cdna/bernardo_article_analysis:sha256.bdd920de92d66d33b8a51398a6f6a5dbdb81c10accc8b841e110edd0a1730486`
 
 
 
-### For more information about software versions see the %help section of definition (.def) files for the singularity images.
+pathway_analysis_2023_10_30_add_gini.def - definition file for singularity container used for tables and figures
+
+`pull command: singularity pull --arch amd64 library://ebbertlab/rna_landscape/pathway_analysis_2023_10_30:sha256.b4fd50793609467e776b760549a8fb8f403aa8d4963c7606be7d158fd67d8330`
+
+
+
+ISAR_software_MAR_11_2025.def - definition file for singularity container used to do analyses with IsoformSwitchAnalyzeR
+
+`pull command: singularity pull --arch amd64 library://ebbertlab/isoform_switch_analyze_r/isar:sha256.08e4ceaa0d28cd0e96382da3ad3f7873050fc3ea08d56307c99f717ba98b2496`
+
